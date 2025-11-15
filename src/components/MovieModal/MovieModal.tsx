@@ -1,6 +1,6 @@
 // src/components/MovieModal/MovieModal.tsx
 import { createPortal } from 'react-dom';
-import type { Movie } from '../types/movie';
+import type { Movie } from '../../types/movie';
 import styles from './MovieModal.module.css';
 
 interface MovieModalProps {
