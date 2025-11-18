@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import { useRef } from "react";
 import styles from "./SearchBar.module.css";
 import { toast } from "react-hot-toast";
 
@@ -7,8 +7,15 @@ export interface SearchBarProps {
 }
 
 const SearchBar = ({ onSubmit }: SearchBarProps) => {
-  const formAction = (formData: FormData) => {
-    const query = (formData.get("query") as string).trim();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); 
+    if (!formRef.current) return;
+
+    const formData = new FormData(formRef.current);
+    const queryValue = formData.get("query");
+    const query = typeof queryValue === "string" ? queryValue.trim() : "";
 
     if (!query) {
       toast("Please enter your search query.");
@@ -16,12 +23,6 @@ const SearchBar = ({ onSubmit }: SearchBarProps) => {
     }
 
     onSubmit(query);
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    formAction(formData);
   };
 
   return (
@@ -36,7 +37,8 @@ const SearchBar = ({ onSubmit }: SearchBarProps) => {
           Powered by TMDB
         </a>
 
-        <form className={styles.form} onSubmit={handleSubmit}>
+        {}
+        <form className={styles.form} action="#" ref={formRef}>
           <input
             className={styles.input}
             type="text"
@@ -45,7 +47,11 @@ const SearchBar = ({ onSubmit }: SearchBarProps) => {
             placeholder="Search movies..."
             autoFocus
           />
-          <button className={styles.button} type="submit">
+          <button
+            className={styles.button}
+            type="submit"
+            onClick={handleButtonClick}
+          >
             Search
           </button>
         </form>
