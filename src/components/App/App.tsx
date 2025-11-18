@@ -1,76 +1,68 @@
-// src/App.tsx
-import { useState } from 'react';
-import { fetchMovies } from '../../services/movieService';
-import type { Movie } from '../../types/movie';
-import SearchBar from '../SearchBar/SearchBar';
-import MovieGrid from '../MovieGrid/MovieGrid';
-import Loader from '../Loader/Loader';
-import ErrorMessage from '../ErrorMessage/ErrorMessage';
-import MovieModal from '../MovieModal/MovieModal';
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import SearchBar from "../SearchBar/SearchBar";
+import MovieGrid from "../MovieGrid/MovieGrid";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import MovieModal from "../MovieModal/MovieModal";
+
+import { fetchMovies } from "../../services/movieService";
+import type { Movie } from "../../types/movie";
+
+import { Toaster, toast } from "react-hot-toast";
+import "modern-normalize/modern-normalize.css";
+
 
 const App = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  // Функція обробки пошуку фільмів
   const handleSearch = async (query: string) => {
-    setLoading(true);
-    setError(null);
     setMovies([]);
+    setError(false);
+    setLoading(true);
 
     try {
-      const result = await fetchMovies(query);
-      if (result.length === 0) {
-        toast.error('No movies found for your request.');
+      const results = await fetchMovies(query);
+
+      if (results.length === 0) {
+        toast("No movies found for your request.");
       }
-      setMovies(result);
-    } catch (err) {
-      setError('There was an error, please try again...');
-      toast.error('There was an error, please try again...');
+
+      setMovies(results);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  // Функція для вибору фільму
   const handleSelectMovie = (movie: Movie) => {
     setSelectedMovie(movie);
   };
 
-  // Функція для закриття модального вікна
   const handleCloseModal = () => {
     setSelectedMovie(null);
   };
 
   return (
-    <div>
-      {/* Пошуковий бар */}
+    <>
       <SearchBar onSubmit={handleSearch} />
 
-      {/* Якщо є помилка, виводимо повідомлення про помилку */}
-      {error && <ErrorMessage />}
-
-      {/* Якщо в процесі завантаження, показуємо індикатор завантаження */}
       {loading && <Loader />}
-
-      {/* Якщо фільми знайдені, виводимо їх у вигляді галереї */}
+      {!loading && error && <ErrorMessage />}
       {!loading && !error && movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={handleSelectMovie} />
       )}
 
-      {/* Якщо вибрано фільм, відображаємо модальне вікно */}
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
       )}
-    </div>
+
+      <Toaster position="top-right" />
+    </>
   );
 };
 
 export default App;
-
-
-
-
