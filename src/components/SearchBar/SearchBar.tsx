@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import styles from "./SearchBar.module.css";
 import { toast } from "react-hot-toast";
 
@@ -7,13 +6,9 @@ export interface SearchBarProps {
 }
 
 const SearchBar = ({ onSubmit }: SearchBarProps) => {
-  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); 
-    if (!formRef.current) return;
 
-    const formData = new FormData(formRef.current);
+  const handleAction = (formData: FormData) => {
     const queryValue = formData.get("query");
     const query = typeof queryValue === "string" ? queryValue.trim() : "";
 
@@ -38,7 +33,7 @@ const SearchBar = ({ onSubmit }: SearchBarProps) => {
         </a>
 
         {}
-        <form className={styles.form} action="#" ref={formRef}>
+        <form className={styles.form} action={handleAction}>
           <input
             className={styles.input}
             type="text"
@@ -47,11 +42,7 @@ const SearchBar = ({ onSubmit }: SearchBarProps) => {
             placeholder="Search movies..."
             autoFocus
           />
-          <button
-            className={styles.button}
-            type="submit"
-            onClick={handleButtonClick}
-          >
+          <button className={styles.button} type="submit">
             Search
           </button>
         </form>
